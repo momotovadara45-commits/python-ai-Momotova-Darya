@@ -1,0 +1,26 @@
+SELECT DISTINCT ?city ?cityLabel ?countryLabel ?monument ?monumentLabel ?monumentTypeLabel
+WHERE {
+  ?monument wdt:P31/wdt:P279* wd:Q4989906.  # Исторический памятник или его подкласс
+  ?monument rdfs:label ?monumentLabel.
+  FILTER(LANG(?monumentLabel) = "ru").
+
+  # Связь памятника с городом
+  { ?monument wdt:P131 ?city. }  # Административная единица (город)
+  UNION
+  { ?monument wdt:P276 ?city. }  # Расположен в городе
+
+  ?city wdt:P31 wd:Q515.  # Город
+  ?city rdfs:label ?cityLabel.
+  FILTER(LANG(?cityLabel) = "ru").
+
+  ?city wdt:P17 ?country.  # Страна
+  ?country rdfs:label ?countryLabel.
+  FILTER(LANG(?countryLabel) = "ru").
+
+  OPTIONAL {
+    ?monument wdt:P31 ?monumentType.  # Тип памятника
+    ?monumentType rdfs:label ?monumentTypeLabel.
+    FILTER(LANG(?monumentTypeLabel) = "ru").
+  }
+}
+LIMIT 100
