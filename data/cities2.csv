@@ -1,0 +1,28 @@
+# Основатели исторических памятников: пол, даты жизни, страна рождения/смерти, образование
+# Founders of historical monuments: gender, birth/death dates, birth/death country, education
+
+SELECT DISTINCT ?monument ?monumentLabel ?founder ?founderLabel ?genderLabel ?birthDate ?deathDate ?lifespan ?birthCountryLabel ?deathCountryLabel ?universityLabel
+WHERE {
+  ?monument wdt:P31/wdt:P279* wd:Q4989906.  # Исторический памятник или его подкласс
+  ?monument wdt:P112 ?founder.               # Основатель
+
+  OPTIONAL { ?founder wdt:P21 ?gender }      # Пол
+  OPTIONAL { ?founder wdt:P569 ?birthDate }   # Дата рождения
+  OPTIONAL { ?founder wdt:P570 ?deathDate }   # Дата смерти
+  OPTIONAL {
+    ?founder wdt:P569 ?birthDate.
+    ?founder wdt:P570 ?deathDate.
+    BIND(YEAR(?deathDate) - YEAR(?birthDate) AS ?lifespan)  # Продолжительность жизни
+  }
+  OPTIONAL {
+    ?founder wdt:P19 ?birthPlace.            # Место рождения
+    ?birthPlace wdt:P17 ?birthCountry.       # Страна рождения
+  }
+  OPTIONAL {
+    ?founder wdt:P20 ?deathPlace.            # Место смерти
+    ?deathPlace wdt:P17 ?deathCountry.       # Страна смерти
+  }
+  OPTIONAL { ?founder wdt:P69 ?university }   # Университет
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "ru,en,mul" }
+}
